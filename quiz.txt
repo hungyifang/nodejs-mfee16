@@ -1,0 +1,10 @@
+1.start IIFE end 過1秒 Timeout，因為set time out 1秒
+
+2.start IIFE end Timeout，雖然set time out 0秒，但 set time out函式讀取後內容被webapis暗樁接管，
+
+進入優先度較stack低的Quene排程，event loop 讀取到stack沒事做才換Quene
+
+
+3.foo bar baz
+
+4.foo baz bar，同Q2
