@@ -1,10 +1,33 @@
-1.start IIFE end 過1秒 Timeout，因為set time out 1秒
+console.log("start");
 
-2.start IIFE end Timeout，雖然set time out 0秒，但 set time out函式讀取後內容被webapis暗樁接管，
+(function () {
+  console.log("IIFE");
+  setTimeout(function () {
+    console.log("Timeout");
+  }, 1000);
+})();
 
-進入優先度較stack低的Quene排程，event loop 讀取到stack沒事做才換Quene
+console.log("end");
+
+1.start IIFE end Timeout，因為set time out 1秒
+
+console.log("start");
+
+(function () {
+  console.log("IIFE");
+  setTimeout(function () {
+    console.log("Timeout");
+  }, 0);
+})();
+
+console.log("end");
+
+2.start IIFE end Timeout，雖然set time out 0秒，但 set time out函式放入stack處理後，內容被webapis暗樁接管，
+
+進入優先度較stack低的Quene排程，event loop 隨時檢查stack，直到沒事做才將Quene中的事情丟入stack
 
 
 3.foo bar baz
 
-4.foo baz bar，同Q2
+4.foo baz bar，同Q2，callback funtion也進入Quene排隊
+
