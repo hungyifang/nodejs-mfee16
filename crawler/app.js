@@ -1,17 +1,17 @@
 const axios = require("axios");
-
+const moment = require("moment");
 const fs = require("fs");
 
-let year = new Date().getFullYear();
-let month = new Date().getMonth() + 1;
-if (month < 10) {
-  month = "0" + month;
-}
-let date = new Date().getDate();
-if (date < 10) {
-  date = "0" + date;
-}
-let dateTime = year + month + date;
+// let year = new Date().getFullYear();
+// let month = new Date().getMonth() + 1;
+// if (month < 10) {
+//   month = "0" + month;
+// }
+// let date = new Date().getDate();
+// if (date < 10) {
+//   date = "0" + date;
+// }
+// let dateTime = year + month + date;
 
 function getStock() {
   return new Promise(function (resolve, reject) {
@@ -23,16 +23,16 @@ function getStock() {
     });
   });
 }
-
-getStock()
-  .then(function (data) {
-    return axios.get(
+async function crawler() {
+  try {
+    let stockNo = await getStock();
+    let response = await axios.get(
       "https://www.twse.com.tw/exchangeReport/STOCK_DAY?",
       {
         params: {
           response: "json",
-          date: dateTime,
-          stockNo: data,
+          date: moment().format("YYYYMMDD"),
+          stockNo: stockNo,
         },
       },
       {
@@ -41,16 +41,43 @@ getStock()
         },
       }
     );
-  })
-  .then(function (response) {
     if (response.data.stat === "OK") {
       console.log(response.data.date);
       console.log(response.data.title);
     }
-  })
-  .catch(function (error) {
-    console.log("讀檔錯誤" + error);
-  });
+  } catch {
+    console.error(error);
+  }
+}
+crawler();
+
+// getStock()
+//   .then(function (data) {
+//     return axios.get(
+//       "https://www.twse.com.tw/exchangeReport/STOCK_DAY?",
+//       {
+//         params: {
+//           response: "json",
+//           date: dateTime,
+//           stockNo: data,
+//         },
+//       },
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+//   })
+//   .then(function (response) {
+//     if (response.data.stat === "OK") {
+//       console.log(response.data.date);
+//       console.log(response.data.title);
+//     }
+//   })
+//   .catch(function (error) {
+//     console.log("讀檔錯誤" + error);
+//   });
 
 // axios
 //   .get(
