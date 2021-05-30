@@ -38,14 +38,23 @@
         xhr.send();
       });
     }
-    asyncBtn.addEventListener("click", function () {
-      xhrPromise()
-        .then(function (result) {
-          message.innerText = result;
-        })
-        .catch(function (error) {
+    async function clickAsyncBtn() {
+        try {
+          let result = await xhrPromise();
+          message.innerText = `async request load ${result}`;
+        } catch {
           message.innerText = error;
-        });
+        }
+      }
+    asyncBtn.addEventListener("click", function () {
+      clickAsyncBtn()
+      // xhrPromise()
+      //   .then(function (result) {
+      //     message.innerText = result;
+      //   })
+      //   .catch(function (error) {
+      //     message.innerText = error;
+      //   });
       // var xhr = new XMLHttpRequest();
       // xhr.open("GET", "http://34.217.120.25:3000", true);
       // xhr.onload = function () {
