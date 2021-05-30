@@ -1,5 +1,7 @@
-// const axios = require('axios');
-// import axios from "../crawler/node_modules/axios";
+const axios = require("axios");
+
+const fs = require("fs");
+
 let year = new Date().getFullYear();
 let month = new Date().getMonth() + 1;
 if (month < 10) {
@@ -11,40 +13,82 @@ if (date < 10) {
 }
 let dateTime = year + month + date;
 
-axios
-  .get("https://www.twse.com.tw/exchangeReport/STOCK_DAY?", {
-    params: {
-      response: "json",
-      date: dateTime,
-      stockNo: "2330",
-    },
-  },{
-    headers: {
-        'Content-Type': 'application/json',
-    }
+function getStock() {
+  return new Promise(function (resolve, reject) {
+    fs.readFile("stock.txt", "utf8", function (err, data) {
+      if (err) {
+        reject(err);
+      }
+      resolve(data);
+    });
+  });
+}
+
+getStock()
+  .then(function (data) {
+    return axios.get(
+      "https://www.twse.com.tw/exchangeReport/STOCK_DAY?",
+      {
+        params: {
+          response: "json",
+          date: dateTime,
+          stockNo: data,
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   })
   .then(function (response) {
-    console.log(response.data);
-    // let tableContent = "";
-    //       for (let i = 0; i < response.data.length; i++) {
-    //         tableContent += `
-    //         <tr>
-    //             <td>${response.data[i][1]}</td>
-    //             <td>${response.data[i][2]}</td>
-    //             <td>${response.data[i][3]}</td>
-    //             <td>${response.data[i][4]}</td>
-    //             <td>${response.data[i][5]}</td>
-    //             <td>${response.data[i][6]}</td>
-    //             <td>${response.data[i][7]}</td>
-    //             <td>${response.data[i][8]}</td>
-    //             <td>${response.data[i][9]}</td>
-    //         </tr>
-    //         `;
-    //       }
-    //       $("#deal").append(tableContent);
-
+    if (response.data.stat === "OK") {
+      console.log(response.data.date);
+      console.log(response.data.title);
+    }
   })
   .catch(function (error) {
-    console.log(error);
-    console.log(error.response);
+    console.log("讀檔錯誤" + error);
   });
+
+// axios
+//   .get(
+//     "https://www.twse.com.tw/exchangeReport/STOCK_DAY?",
+//     {
+//       params: {
+//         response: "json",
+//         date: dateTime,
+//         stockNo: "2330",
+//       },
+//     },
+//     {
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     }
+//   )
+//   .then(function (response) {
+//     console.log(response.data);
+//     let tableContent = "";
+//           for (let i = 0; i < response.data.length; i++) {
+//             tableContent += `
+//             <tr>
+//                 <td>${response.data[i][1]}</td>
+//                 <td>${response.data[i][2]}</td>
+//                 <td>${response.data[i][3]}</td>
+//                 <td>${response.data[i][4]}</td>
+//                 <td>${response.data[i][5]}</td>
+//                 <td>${response.data[i][6]}</td>
+//                 <td>${response.data[i][7]}</td>
+//                 <td>${response.data[i][8]}</td>
+//                 <td>${response.data[i][9]}</td>
+//             </tr>
+//             `;
+//           }
+//           $("#deal").append(tableContent);
+//   })
+//   .catch(function (error) {
+//     console.log(error);
+//     console.log(error.response);
+//   });
