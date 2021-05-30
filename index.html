@@ -21,24 +21,47 @@
       count.innerText = parseInt(count.innerText, 10) + 1;
     });
 
-    asyncBtn.addEventListener("click",function(){
+    function xhrPromise() {
+      return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
-
-        xhr.open("GET","http://34.217.120.25:3000",true);
-        xhr.onload = function(){
-            message.innerText = `async request load ${this.responseText} `
+        xhr.open("GET", "http://34.217.120.25:3000", true);
+        xhr.onerror = function () {
+          reject(this.statusText);
+        };
+        xhr.onload = function () {
+          if (this.status === 200) {
+            resolve(this.responseText);
+          } else {
+            reject(this.status);
+          }
         };
         xhr.send();
+      });
+    }
+    asyncBtn.addEventListener("click", function () {
+      xhrPromise()
+        .then(function (result) {
+          message.innerText = result;
+        })
+        .catch(function (error) {
+          message.innerText = error;
+        });
+      // var xhr = new XMLHttpRequest();
+      // xhr.open("GET", "http://34.217.120.25:3000", true);
+      // xhr.onload = function () {
+      //   message.innerText = `async request load ${this.responseText} `;
+      // };
+      // xhr.send();
     });
 
-    syncBtn.addEventListener("click",function(){
-        var xhr = new XMLHttpRequest();
+    syncBtn.addEventListener("click", function () {
+      var xhr = new XMLHttpRequest();
 
-        xhr.open("GET","http://34.217.120.25:3000",false);
-        xhr.onload = function(){
-            message.innerText = `sync request load ${this.responseText} `
-        };
-        xhr.send();
+      xhr.open("GET", "http://34.217.120.25:3000", false);
+      xhr.onload = function () {
+        message.innerText = `sync request load ${this.responseText} `;
+      };
+      xhr.send();
     });
   </script>
 </html>
