@@ -1,7 +1,8 @@
 const axios = require("axios");
 const moment = require("moment");
-const fs = require("fs/promises");
+const fs = require("fs");
 const Promise = require("bluebird");
+const readFileBlueBird = Promise.promisify(fs.readFile);
 
 // let year = new Date().getFullYear();
 // let month = new Date().getMonth() + 1;
@@ -26,7 +27,7 @@ const Promise = require("bluebird");
 // }
 async function crawler() {
   try {
-    let stockNo = await fs.readFile("stock.txt", "utf8");
+    let stockNo = await readFileBlueBird("stock.txt", "utf8");
     let response = await axios.get(
       "https://www.twse.com.tw/exchangeReport/STOCK_DAY?",
       {
