@@ -34,7 +34,7 @@ async function stockQuerier() {
             return value[0] === stockNo;
           }); //! answer=[[stockNo,stockName]]
 
-        let insertDB = connection.queryAsync(
+        let insertDB = await connection.queryAsync(
           `INSERT INTO stock (stock_id,stock_name) VALUES ('${answer[0][0]}','${answer[0][1]}') `
         );
       }
