@@ -1,6 +1,6 @@
 const axios = require("axios");
 const moment = require("moment");
-const fs = require("fs");
+const fs = require("fs/promises");
 
 // let year = new Date().getFullYear();
 // let month = new Date().getMonth() + 1;
@@ -13,19 +13,19 @@ const fs = require("fs");
 // }
 // let dateTime = year + month + date;
 
-function getStock() {
-  return new Promise(function (resolve, reject) {
-    fs.readFile("stock.txt", "utf8", function (err, data) {
-      if (err) {
-        reject(err);
-      }
-      resolve(data);
-    });
-  });
-}
+// function getStock() {
+//   return new Promise(function (resolve, reject) {
+//     fs.readFile("stock.txt", "utf8", function (err, data) {
+//       if (err) {
+//         reject(err);
+//       }
+//       resolve(data);
+//     });
+//   });
+// }
 async function crawler() {
   try {
-    let stockNo = await getStock();
+    let stockNo = await fs.readFile("stock.txt", "utf8");
     let response = await axios.get(
       "https://www.twse.com.tw/exchangeReport/STOCK_DAY?",
       {
