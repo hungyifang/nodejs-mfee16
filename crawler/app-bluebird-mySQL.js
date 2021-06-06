@@ -4,12 +4,13 @@ const fs = require("fs");
 const Promise = require("bluebird");
 const readFileBlueBird = Promise.promisify(fs.readFile);
 const mysql = require("mysql");
+require("dotenv").config();
 
 let connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "stock",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
 });
 connection = Promise.promisifyAll(connection);
 connection.connectAsync();
