@@ -19,11 +19,13 @@ async function stockQuerier() {
   try {
     let stockNo = await readFileBlueBird("stock.txt", "utf8");
     let ckeckDB = await connection.queryAsync(
-      `SELECT stock_id,stock_name FROM stock WHERE stock_id='${stockNo}'`
+      `SELECT stock_id,stock_name FROM stock WHERE stock_id=?`,
+      [stockNo]
     );
     if (ckeckDB.length === 0) {
       let findStock = await axios.get(
-        `https://www.twse.com.tw/zh/api/codeQuery?query=${stockNo}`
+        `https://www.twse.com.tw/zh/api/codeQuery?query=?`,
+        [stockNo]
       );
       if (findStock.data.suggestions.length > 0) {
         let answer = findStock.data.suggestions
@@ -39,9 +41,24 @@ async function stockQuerier() {
           `INSERT INTO stock (stock_id,stock_name) VALUES ('${answer[0][0]}','${answer[0][1]}') `
         );
       }
-    }else{
-      console.log(ckeckDB);
     }
+    let stockData = await axios.get(
+      "https://www.twse.com.tw/exchangeReport/STOCK_DAY?",
+      {
+        params: {
+          response: "json",
+          date: moment().format("YYYYMMDD"),
+          stockNo: stockNo,
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(stockData.data.data);
+    
   } catch {
     console.error(error);
   } finally {
