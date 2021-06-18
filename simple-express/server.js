@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+const Promise = require("bluebird");
+require("dotenv").config();
+const connection = require("./uilts/db.js");
 
 //載入靜態檔案
 app.use(express.static("public"));
@@ -25,6 +28,18 @@ app.get("/", (req, res) => {
 app.get("/about", function (req, res) {
   // res.send("About Express");
   res.render("about");
+});
+app.get("/stock", async function (req, res) {
+  // res.send("About Express");
+  try {
+    await connection.connectAsync();
+    let result = await connection.queryAsync(
+      `SELECT stock_id,stock_name FROM stock`
+    );
+    res.render("./stock/list", { stocks: result });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 app.get("/test", function (req, res) {
