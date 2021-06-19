@@ -1,4 +1,23 @@
 extends ../_layouts/master
 
 block content 
-  h1 股票交易詳細
+  h1 股票交易詳細: #{info.stock_name}
+  table 
+        tr
+          th 日期
+          th 開盤價
+          th 收盤價
+          th 最高價
+          th 最低價
+
+        each stock in stocks
+          tr
+            td #{stock.date} 
+            td #{stock.open_price}
+            td #{stock.close_price}
+            td #{stock.high_price}
+            td #{stock.low_price}
+
+  .pagination 
+    - for(var p = 1; p < pages; p++)
+      a(href=`/stock/${info.stock_id}?page=${p}`, class=p==currentPage?"active":"") #{p}

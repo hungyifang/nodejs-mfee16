@@ -3,10 +3,13 @@ html
   head
     title MFEE 16 Express 練習
     meta(charset="utf-8")
-    link(rel='stylesheet', href="style/main.css", type='text/css')
-  
+    link(rel='stylesheet', href="/style/main.css", type='text/css')
+    script(src='https://code.jquery.com/jquery-3.6.0.min.js',integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=",crossorigin="anonymous")
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+    block script 
   body
     include header
     //- 挖洞 
     block content
     include footer
+  script 

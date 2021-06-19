@@ -3,12 +3,12 @@ extends ../_layouts/master
 block content 
   h1 股票代碼清單
   table 
-  
     tr
       th 股票代碼
       th 股票名稱
 
     each stock in stocks
       tr
-        td= stock.stock_id 
-        td= stock.stock_name
+        td 
+          a(href=`/stock/${stock.stock_id}`) #{stock.stock_id} 
+        td #{stock.stock_name}
