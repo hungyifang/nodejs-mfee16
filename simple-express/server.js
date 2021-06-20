@@ -6,6 +6,7 @@ require("dotenv").config();
 // const connection = require("./uilts/db.js");
 let stockRouter = require("./routes/stock");
 let apiRouter = require("./routes/api");
+let authRouter = require("./routes/auth");
 
 //載入靜態檔案
 app.use(express.static("public"));
@@ -32,9 +33,11 @@ app.get("/about", function (req, res) {
   res.render("about");
 });
 
-app.use("/api", apiRouter);
+app.use("/api", apiRouter); // /api是顯示出來的網址 不是來源的路境
 
 app.use("/stock", stockRouter);
+
+app.use("/auth", authRouter);
 // app.get("/stock", async function (req, res) {
 //   try {
 //     // await connection.connectAsync();
