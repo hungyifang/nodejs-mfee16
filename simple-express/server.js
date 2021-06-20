@@ -8,6 +8,8 @@ let stockRouter = require("./routes/stock");
 let apiRouter = require("./routes/api");
 let authRouter = require("./routes/auth");
 
+// 解讀POST資料
+app.use(express.urlencoded({ extended: false }));
 //載入靜態檔案
 app.use(express.static("public"));
 
