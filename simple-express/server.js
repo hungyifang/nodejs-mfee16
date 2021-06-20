@@ -7,7 +7,18 @@ require("dotenv").config();
 let stockRouter = require("./routes/stock");
 let apiRouter = require("./routes/api");
 let authRouter = require("./routes/auth");
-
+let memberRouter = require("./routes/member");
+// 寫入cookie(存在瀏覽器),用res.cookie()設定
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+//session
+const expressSession = require("express-session");
+app.use(
+  expressSession({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+  })
+);
 // 解讀POST資料
 app.use(express.urlencoded({ extended: false }));
 //載入靜態檔案
@@ -18,6 +29,13 @@ app.use(express.static("public"));
 app.set("views", "views");
 // 告訴 express 我們用的 view engine 是 pug
 app.set("view engine", "pug");
+
+//取用session寫在主伺服器中間件以共用
+app.use(function (req, res, next) {
+  //res.locals.member傳給PUG看
+  res.locals.member = req.session.member;
+  next();
+});
 
 app.use(function (req, res, next) {
   let current = new Date();
@@ -40,6 +58,8 @@ app.use("/api", apiRouter); // /api是顯示出來的網址 不是來源的路�
 app.use("/stock", stockRouter);
 
 app.use("/auth", authRouter);
+
+app.use("/member", memberRouter);
 // app.get("/stock", async function (req, res) {
 //   try {
 //     // await connection.connectAsync();
@@ -82,7 +102,7 @@ app.use(function (req, res, next) {
 app.use(function (err, req, res, next) {
   console.log(err.message);
   res.status(500);
-  res.send("500 - Internal Sever Error 請洽系統管理員 XD");
+  res.send("500 - Internal Sever Error 請洽系統管理員 XD </br>" + err.message);
 });
 app.listen(port, () => {
   console.log(`listening :${port}`);

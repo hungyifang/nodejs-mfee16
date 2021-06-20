@@ -3,7 +3,6 @@ const router = express.Router();
 const connection = require("../uilts/db.js");
 const moment = require("moment");
 const bcrypt = require("bcrypt"); //密碼加密
-
 const path = require("path"); //內建路徑工具
 const multer = require("multer");
 const myStorage = multer.diskStorage({
@@ -18,7 +17,7 @@ const myStorage = multer.diskStorage({
     console.log(file);
     const ext = file.originalname.split(".").pop();
     // 組合出自己想要的檔案名稱
-    cb(null, `${file.fieldname}-${moment().format("YYYYMMDD")}.${ext}`);
+    cb(null, `${file.fieldname}-${moment().format("YYYYMMDDHHMMSS")}.${ext}`);
   },
 });
 const uploader = multer({
@@ -44,10 +43,45 @@ const uploader = multer({
 const { body, validationResult } = require("express-validator");
 const { connect } = require("../uilts/db.js");
 
+//登入
+const loginRules = [
+  body("email").isEmail().withMessage("請正確輸入 Email 格式"),
+  body("password").isLength({ min: 6 }),
+];
 router.get("/login", async function (req, res) {
   res.render("./auth/login");
 });
 
+router.post("/login", loginRules, async function (req, res, next) {
+  const result = validationResult(req.body);
+  if (!result.isEmpty()) {
+    return next(new Error("帳號密碼格式錯誤"));
+  }
+  let checkAcc = await connection.queryAsync(
+    "SELECT * FROM members WHERE email=?",
+    [req.body.email]
+  );
+  if (checkAcc.length === 0) {
+    return next(new Error("查無此帳號"));
+  }
+  checkAcc = checkAcc[0];
+  let compare = await bcrypt.compare(req.body.password, checkAcc.password);
+  if (compare !== true) {
+    return next(new Error("密碼錯誤"));
+  }
+  req.session.member = {
+    email: checkAcc.email,
+    name: checkAcc.name,
+    password: checkAcc.password,
+  };
+  res.redirect(303, "/");
+});
+//登出
+router.get("/logout", async function (req, res) {
+  req.session.member = null;//並沒有刪除整個session 只刪除member資料 所以認得ID
+  res.redirect(303, "/",);
+});
+//註冊
 router.get("/register", async function (req, res) {
   res.render("./auth/register");
 });
@@ -80,15 +114,11 @@ router.post(
     if (checkDB.length > 0) {
       return next(new Error("註冊過了"));
     }
+    let filepath = req.file ? "/upload/" + req.file.filename : null;
     let password = await bcrypt.hash(req.body.password, 10);
     let insertDB = await connection.queryAsync(
       "INSERT INTO members (email,password,name,photo) VALUES (?,?,?,?) ",
-      [
-        [req.body.email],
-        [password],
-        [req.body.name],
-        [`/upload/${req.file.filename}`],
-      ]
+      [[req.body.email], [password], [req.body.name], [filepath]]
     );
     res.send("註冊成功");
   }
