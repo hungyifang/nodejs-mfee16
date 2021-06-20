@@ -38,6 +38,17 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
+  //res.locals.傳給PUG看
+  if(req.session.message){
+    res.locals.message = req.session.message;
+    console.log(res.locals.message);
+    delete req.session.message;
+  }
+  next();
+});
+
+
+app.use(function (req, res, next) {
   let current = new Date();
   console.log(`有人來訪問了喔 在 ${current}`);
   // 幾乎都要呼叫，讓他往下繼續

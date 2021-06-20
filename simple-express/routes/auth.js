@@ -28,7 +28,7 @@ const uploader = multer({
     }
     // file.originalname: Name of the file on the user's computer
     // 101.jpeg
-    if (!file.originalname.match(/\.(jpg|jpeg|png|PNG)$/)) {
+    if (!file.originalname.toLowerCase().match(/\.(jpg|jpeg|png)$/)) {
       return cb(new Error("是不合格的副檔名"));
     }
     // 檔案ＯＫ, 接受這個檔案
@@ -66,14 +66,25 @@ router.post("/login", loginRules, async function (req, res, next) {
   }
   checkAcc = checkAcc[0];
   let compare = await bcrypt.compare(req.body.password, checkAcc.password);
-  if (compare !== true) {
-    return next(new Error("密碼錯誤"));
+  if (compare === false) {
+      req.session.member =null
+      req.session.message = {
+        title: "error",
+        text: `密碼錯誤`,
+      };
+    res.redirect(303, "/auth/login");
   }
+  
   req.session.member = {
     email: checkAcc.email,
     name: checkAcc.name,
     password: checkAcc.password,
   };
+  req.session.message = {
+    title: "welcome",
+    text: `${checkAcc.name} 歡迎回來`,
+  };
+//   console.log(req.session.message);
   res.redirect(303, "/");
 });
 //登出

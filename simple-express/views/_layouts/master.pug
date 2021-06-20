@@ -13,3 +13,7 @@ html
     block content
     include footer
     block script
+
+    if message
+      script.
+        alert("#{message.title},#{message.text}") 
